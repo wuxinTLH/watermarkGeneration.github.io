@@ -6,7 +6,7 @@
 * @author SakuraMikku
 * @description 用于生成水印
 * @createTime 2024-12-2
-* @updateTime 2024-12-3
+* @updateTime 2024-12-6
 *
 -->
 <html lang="zh">
@@ -36,8 +36,8 @@
 
     #default,
     #background {
-      width: 100vw;
-      height: 100vh;
+      width: 99vw;
+      height: 99.9vh;
       position: absolute;
       top: 0;
       left: 0;
@@ -48,8 +48,9 @@
     }
 
     #background {
-      background-color: green;
+      /* background-color: green; */
       display: none;
+      width: 99.9vw;
       /* 默认隐藏 */
     }
 
@@ -153,7 +154,7 @@
       <label for="speed" class="full-screen-only">水印移动速度 (默认1):</label>
       <input type="number" id="speed" value="1" min="0" max="10" class="full-screen-only" />
 
-      <label for="angle" class="full-screen-only">水印角度 (默认45度,90度会卡死):</label>
+      <label for="angle" class="full-screen-only">水印角度 (默认45度,90度会卡死,负数不行):</label>
       <input type="number" id="angle" value="45" min="0" max="89" class="full-screen-only" />
 
       <label for="targetRows" class="full-screen-only">目标行数 (默认8):</label>
@@ -284,6 +285,10 @@
 
       // 调整 canvas 的大小
       resizeCanvas();
+
+      // 填充整个 canvas 为绿色
+      ctx.fillStyle = "green"; // 绿色
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
     // 监听watermarkStyleSelect的变化
@@ -369,6 +374,8 @@
 
       // 清除画布
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'green';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // 设置字体样式
       ctx.font = `${fontSize}px Arial`;
@@ -413,7 +420,11 @@
 
     //固定位置水印
     function drawWatermarksTypeTwo(param) {
+      // 清除画布
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'green';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
       ctx.font = `${param.fontSize}px Arial`;
       ctx.fillStyle = `rgba(255, 255, 255, ${param.alpha})`;
       ctx.textAlign = "left";
@@ -430,9 +441,15 @@
       );
 
     }
+
+    let lastTime = 0;
     // 绘制环形水印
     function drawWatermarksTypeThree(param) {
+      // 清除画布
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'green';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
       let fontSize = param.fontSize;
       let charSpacing = param.circleCharSpacing;
       const text = param.text;
@@ -441,6 +458,7 @@
       const radius = param.circleRadius;
       const ringCount = param.circleRingCount;
       const circularSpeed = param.circularSpeed;
+
 
       // 更新偏移量
       offset += circularSpeed;
@@ -481,8 +499,6 @@
           ctx.fillText(text[i], x, y);
         }
       }
-
-      setTimeout(() => { }, 10000);
     }
 
     // 开始录制
@@ -491,7 +507,7 @@
       isRecording = true;
       recordedChunks = [];
       mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "video/webm;codecs=vp9",
+        mimeType: "video/mp4",
       });
       mediaRecorder.ondataavailable = (event) => {
         if (event.data && event.data.size > 0) {
@@ -506,12 +522,12 @@
       isRecording = false;
       mediaRecorder.stop();
       mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: "video/webm" });
+        const blob = new Blob(recordedChunks, { type: "video/mp4" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.style.display = "none";
         a.href = url;
-        a.download = "水印.webm";
+        a.download = "水印.mp4";
         document.body.appendChild(a);
         a.click();
         setTimeout(() => {
