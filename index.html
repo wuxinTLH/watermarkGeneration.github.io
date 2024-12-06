@@ -2,7 +2,7 @@
 <!--
 /**
 * @name 水印生成器
-* @version 0.0.0.1-alpha
+* @version 0.0.0.3-alpha
 * @author SakuraMikku
 * @description 用于生成水印
 * @createTime 2024-12-2
@@ -134,40 +134,59 @@
     <div id="controls">
       <h1>水印生成器</h1>
 
-      <label for="watermarkStyle">水印类型(默认全屏水印)</label>
-      <select name="" id="watermarkStyleSelect">
-        <option value="1" selected>全屏水印 - 移动的文字</option>
-        <option value="2">固定位置水印 - 固定位置的文字</option>
-        <option value="3">环形水印 - 环绕中心的文字</option>
-        <option value="4">其他 - 待定</option>
-      </select>
+      <div class="public">
+        <label for="watermarkStyle">水印类型(默认全屏水印)</label>
+        <select name="" id="watermarkStyleSelect">
+          <option value="1" selected>全屏水印 - 移动的文字</option>
+          <option value="2">固定位置水印 - 固定位置的文字</option>
+          <option value="3">环形水印 - 环绕中心的文字</option>
+          <option value="4">其他 - 待定</option>
+        </select>
 
-      <label for="text">水印文字:</label>
-      <input type="text" id="text" value="@copyright" />
+        <label for="">文件名：(默认水印)</label>
+        <input type="text" id="fileNameInput" placeholder="文件名" value="水印">
 
-      <label for="fontSize">字体大小 (px):</label>
-      <input type="number" id="fontSize" value="40" min="10" max="100" class="always-visible" />
+        <label for="">文件类型:(默认mp4)</label>
+        <select name="" id="fileSuffixSelect">
+          <option value="mp4" selected>MP4</option>
+          <option value="webm">webm</option>
+        </select>
 
-      <label for="charAlpha">水印字符透明度 (默认0.5):</label>
-      <input type="number" id="charAlpha" value="0.5" min="0.1" max="1" step="0.1" class="always-visible" />
+        <label for=""></label>
 
-      <label for="speed" class="full-screen-only">水印移动速度 (默认1):</label>
-      <input type="number" id="speed" value="1" min="0" max="10" class="full-screen-only" />
+        <label for="text">水印文字:</label>
+        <input type="text" id="text" value="@copyright" />
 
-      <label for="angle" class="full-screen-only">水印角度 (默认45度,90度会卡死,负数不行):</label>
-      <input type="number" id="angle" value="45" min="0" max="89" class="full-screen-only" />
+        <label for="fontSize">字体大小 (px):</label>
+        <input type="number" id="fontSize" value="40" min="10" max="100" class="always-visible" />
 
-      <label for="targetRows" class="full-screen-only">目标行数 (默认8):</label>
-      <input type="number" id="targetRows" value="8" min="1" max="20" class="full-screen-only" />
+        <label for="charAlpha">水印字符透明度 (默认0.5):</label>
+        <input type="number" id="charAlpha" value="0.5" min="0.1" max="1" step="0.1" class="always-visible" />
+      </div>
 
-      <label for="charSpacing" class="full-screen-only">水印字符间距 (默认240):</label>
-      <input type="number" id="charSpacing" value="240" min="100" max="600" class="full-screen-only" />
 
-      <label for="ramdomSpacing" class="full-screen-only">随机间距:</label>
-      <select name="" id="ramdomSpacingSelect" class="full-screen-only">
-        <option value="0" selected class="full-screen-only">否</option>
-        <option value="1" class="full-screen-only">是</option>
-      </select>
+
+      <div class="full-screen-only">
+        <label for="speed">水印移动速度 (默认1):</label>
+        <input type="number" id="speed" value="1" min="0" max="10" class="full-screen-only" />
+
+        <label for="angle">水印角度 (默认45度,90度会卡死,负数不行):</label>
+        <input type="number" id="angle" value="45" min="0" max="89" class="full-screen-only" />
+
+        <label for="targetRows">目标行数 (默认8):</label>
+        <input type="number" id="targetRows" value="8" min="1" max="20" class="full-screen-only" />
+
+        <label for="charSpacing">水印字符间距 (默认240):</label>
+        <input type="number" id="charSpacing" value="240" min="100" max="600" class="full-screen-only" />
+
+        <label for="ramdomSpacing">随机间距:</label>
+        <select name="" id="ramdomSpacingSelect">
+          <option value="0" selected>否</option>
+          <option value="1">是</option>
+        </select>
+      </div>
+
+
 
       <div class="fixed-watermark-params" style="display: none">
         <label for="fixedX">固定位置X坐标 (px):</label>
@@ -245,6 +264,19 @@
     const circleRingCountInput = document.getElementById("ringCount");
     const circleCharSpacingCircularInput = document.getElementById("charSpacingCircular");
 
+
+
+    //后缀名称列表
+    const fileSuffixObj = {
+      "mp4": {
+        type: "video/mp4",
+        suffix: "mp4"
+      },
+      "webm": {
+        type: "video/webm",
+        suffix: "webm"
+      },
+    }
 
     let isRecording = false;
 
@@ -449,7 +481,6 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = 'green';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
       let fontSize = param.fontSize;
       let charSpacing = param.circleCharSpacing;
       const text = param.text;
@@ -503,11 +534,12 @@
 
     // 开始录制
     function startRecording() {
+      let fileSuffix = document.querySelector("#fileSuffixSelect").value;
       const stream = canvas.captureStream();
       isRecording = true;
       recordedChunks = [];
       mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "video/mp4",
+        mimeType: fileSuffixObj[fileSuffix].type,
       });
       mediaRecorder.ondataavailable = (event) => {
         if (event.data && event.data.size > 0) {
@@ -521,13 +553,19 @@
     function stopRecordingAndSave() {
       isRecording = false;
       mediaRecorder.stop();
+
       mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: "video/mp4" });
+        let fileSuffix = document.querySelector("#fileSuffixSelect").value;
+        const blob = new Blob(recordedChunks, { type: fileSuffixObj[fileSuffix].type });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.style.display = "none";
         a.href = url;
-        a.download = "水印.mp4";
+        let fileName = document.querySelector("#fileNameInput").value;
+        if (fileName === "" || fileName === null) {
+          fileName = "水印";
+        }
+        a.download = fileName + "." + fileSuffixObj[fileSuffix].suffix;
         document.body.appendChild(a);
         a.click();
         setTimeout(() => {
