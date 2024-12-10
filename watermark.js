@@ -4,8 +4,27 @@
  * @author SakuraMikku
  * @description 用于生成水印
  * @createTime 2024-12-2
- * @updateTime 2024-12-6
+ * @updateTime 2024-12-10
  */
+
+const copyright = {
+  name: "水印生成器",
+  version: "0.0.0.3-alpha",
+  author: "SakuraMikku",
+  description: "用于水印生成",
+  createTime: "2024-12-2",
+  updateTime: "2024-12-9",
+  biliLink: "https://space.bilibili.com/29058270",
+  githubLink: "https://github.com/wuxinTLH",
+};
+
+function init() {
+  const versionP = document.querySelector("#version");
+  versionP.innerHTML = copyright.version;
+}
+document.addEventListener("DOMContentLoaded", function () {
+  init();
+});
 
 // 获取DOM元素
 var canvas = document.getElementById("watermarkCanvas");
@@ -220,7 +239,7 @@ function drawWatermarksTypeOne(param) {
       // 根据 randomSpacing 参数决定是否使用随机间距
       if (randomSpacing === 1) {
         // 生成一个基于 charSpacing 的随机间距
-        let spacing = charSpacing + (Math.random() * 20 - 10); // 随机范围为 [-10, 10]
+        let spacing = charSpacing + (Math.random() * 40 - 10); // 随机
         startX += textWidth + spacing; // 增加随机字符间距
       } else {
         startX += textWidth + charSpacing; // 使用固定字符间距

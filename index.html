@@ -6,7 +6,7 @@
 * @author SakuraMikku
 * @description 用于生成水印
 * @createTime 2024-12-2
-* @updateTime 2024-12-6
+* @updateTime 2024-12-10
 *
 -->
 <html lang="zh">
@@ -80,7 +80,10 @@
       font-size: 24px;
       margin-bottom: 20px;
     }
-
+    #controls h1>p{
+      color: #000;
+      font-size: 12px;
+    }
     #controls label {
       display: block;
       margin-bottom: 5px;
@@ -132,7 +135,10 @@
 <body>
   <div id="default">
     <div id="controls">
-      <h1>水印生成器</h1>
+      <h1>水印生成器
+        <p id="version"></p>
+        <p id="">powered by <a href="https://space.bilibili.com/29058270" target="_blank" style="color: #0056b3;">SakuraMikku</a></p>
+      </h1>
 
       <div class="public">
         <label for="watermarkStyle">水印类型(默认全屏水印)</label>
